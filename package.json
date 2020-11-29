@@ -10,6 +10,10 @@
   "author": "https://github.com/Huriosity",
   "license": "ISC",
   "dependencies": {
+    "buffer": "^6.0.3",
+    "iconv": "^3.0.0",
+    "iconv-lite": "^0.6.2",
+    "node-fetch": "^2.6.1",
     "telegraf": "^3.38.0"
   }
 }
