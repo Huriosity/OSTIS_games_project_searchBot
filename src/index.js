@@ -25,6 +25,8 @@ function checkString(ctx) {
     switch (arrStr[0]) {
         case "game": {
             console.log("should get game by name");
+            let gameName = getFullGameName(arrStr);
+            fetchData(`http://localhost:8080/game_id?name=${gameName}`, ctx);
             break;
         }
         case "allGames": {
@@ -37,11 +39,11 @@ function checkString(ctx) {
         case "partOfGames": {
             console.log("should get many games by filters");
             // http://localhost:8080/game_part?publisher=Valve
-            let gameNAme = getFilter("name", arrStr);
+            let gameName = getFilter("name", arrStr);
             let publisher = getFilter("publisher", arrStr);
             let developer = getFilter("developer", arrStr);
             console.log("find this publisher ", publisher);
-            fetchData(`http://localhost:8080/game_part?name=${gameNAme}&publisher=${publisher}&developer=${developer}`, ctx)
+            fetchData(`http://localhost:8080/game_part?name=${gameName}&publisher=${publisher}&developer=${developer}`, ctx)
 
             break;
         }
@@ -50,13 +52,30 @@ function checkString(ctx) {
             break;
         }
     }
-    console.log(typeof str);
-    console.log(str);
-    ctx.reply("find text")
+}
+
+function getFullGameName(arrStr) {
+    let nameIndex = arrStr.findIndex( el => el === "name");
+    if (nameIndex === -1) {
+        return "";
+    }
+
+    let arrayOfFilterNames = ["name","publisher", "developer", "platform"];
+    let result = "";
+
+    for (let i = nameIndex + 1; i < arrStr.length; i += 1) {
+        if (arrayOfFilterNames.includes(arrStr[i])) {
+            break;
+        }
+        result += arrStr[i] + "+";
+    }
+    result = result.substring(0, result.length -1);
+    console.log("result = ", result);
+    return result;
 }
 
 function getFilter(filterName, arrStr) {
-    let arrayOfFilterNames = ["publisher", "developer", "platform"];
+    let arrayOfFilterNames = ["name","publisher", "developer", "platform"];
     for (let i = 0; i < arrStr.length; i += 1) {
         if (arrStr[i] === filterName && i <= arrStr.length - 2) {
             if (!arrayOfFilterNames.includes(arrStr[i + 1])) {
@@ -77,11 +96,25 @@ function fetchData(url, ctx) {
         .then(res => res.arrayBuffer())
         .then(arrayBuffer => iconv.decode(Buffer.from(arrayBuffer), 'win1251').toString())
         .then(response => {
+
             return JSON.parse(response)})
         .then(data => {
-            result = parseResponse((data));
+            console.log("response ", data);
+            console.log(typeof data);
+            console.log(Array.isArray(data));
+            if(Array.isArray(data)){
+                result = parseResponse((data));
+            } else {
+                let tmparr = [];
+                tmparr.push(data);
+                result = parseResponse((tmparr));
+                console.log(Array.isArray(tmparr));
+            }
+
         }).then(() => {
+           
             for(let i = 0; i < result.length; i += 1) {
+                console.log("result ", result[i]);
                 ctx.reply("название: "+ " " + result[i]["name"] + "\n" + 
                           "издатель: "+ " " + result[i]["publisher"] + "\n" + 
                           "разработчик: "+ " " + result[i]["developer"] + "\n" +  
@@ -94,9 +127,6 @@ function fetchData(url, ctx) {
 }
 
 function parseResponse(response) {
-    console.log("response");
-    console.log(typeof response);
-    console.log(response.length);
     let result = [];
     for (let i = 0; i < response.length; i += 1) {
         result[i] = {};
