@@ -9,14 +9,23 @@ console.log(process.env.OSTIS_GAME_PROJECT_TBOT_KEY);
 
 const bot = new Telegraf(process.env.OSTIS_GAME_PROJECT_TBOT_KEY)
 bot.start((ctx) => ctx.reply('Welcome'))
-bot.help((ctx) => ctx.reply('Send me a sticker'))
+bot.help((ctx) => ctx.reply(help()))
 bot.on('sticker', (ctx) => ctx.reply('👍'))
 bot.on('text', (ctx) => checkString(ctx))// (ctx) => ctx.reply("find text"))
 bot.hears('hi', (ctx) => ctx.reply('Hey there'))
 bot.launch()
 
 
-
+function help(){
+    return "Данный телеграм бот предназначен для поиска компьютерных игр.\n"
+    + "Доступные команды:\n"
+    + "allGames - выведет список всех игр в системе\n"
+    + "game name gameName - Выведет всю информацию про gameName\n"
+    + "partOfGames - выведен список всех игр в системе,соответствующих заданным параметрам поиска\n"
+    + "парамерты поиска для partOfGames:\n"
+    + "keys: name, publisher, developer, platform\n"
+    + "Пример использования: partOfGames name Just";
+}
 
 
 function checkString(ctx) {
