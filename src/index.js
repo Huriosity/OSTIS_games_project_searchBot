@@ -4,16 +4,15 @@ const fetch = require('node-fetch');
 const Buffer = require('buffer').Buffer;
 iconv = require('iconv-lite');
 
-console.log("OSTIS_GAME_PROJECT_TBOT_KEY");
-console.log(process.env.OSTIS_GAME_PROJECT_TBOT_KEY);
+console.log("OSTIS_GAME_PROJECT_TBOT");
 
-const bot = new Telegraf(process.env.OSTIS_GAME_PROJECT_TBOT_KEY)
-bot.start((ctx) => ctx.reply('Welcome'))
-bot.help((ctx) => ctx.reply(help()))
-bot.on('sticker', (ctx) => ctx.reply('👍'))
-bot.on('text', (ctx) => checkString(ctx))// (ctx) => ctx.reply("find text"))
-bot.hears('hi', (ctx) => ctx.reply('Hey there'))
-bot.launch()
+const bot = new Telegraf(process.env.OSTIS_GAME_PROJECT_TBOT_KEY);
+bot.start((ctx) => ctx.reply('Welcome'));
+bot.help((ctx) => ctx.reply(help()));
+bot.hears('hi', (ctx) => ctx.reply('Hey there'));
+bot.on('sticker', (ctx) => ctx.reply('👍'));
+bot.on('text', (ctx) => checkString(ctx));
+bot.launch();
 
 
 function help(){
@@ -41,23 +40,19 @@ function checkString(ctx) {
         case "allGames": {
             console.log("should get all games");
             const url = "http://localhost:8080/game?";
-            // getXHR("http://localhost:8080/game?");
             fetchData(url, ctx);
             break;
         }
         case "partOfGames": {
             console.log("should get many games by filters");
-            // http://localhost:8080/game_part?publisher=Valve
             let gameName = getFilter("name", arrStr);
             let publisher = getFilter("publisher", arrStr);
             let developer = getFilter("developer", arrStr);
-            console.log("find this publisher ", publisher);
-            fetchData(`http://localhost:8080/game_part?name=${gameName}&publisher=${publisher}&developer=${developer}`, ctx)
 
+            fetchData(`http://localhost:8080/game_part?name=${gameName}&publisher=${publisher}&developer=${developer}`, ctx);
             break;
         }
         default: {
-
             break;
         }
     }
@@ -104,9 +99,7 @@ function fetchData(url, ctx) {
     fetch(url, { mode: "cors", 'Content-Type': 'text/plain; charset=windows-1251' }) //, 
         .then(res => res.arrayBuffer())
         .then(arrayBuffer => iconv.decode(Buffer.from(arrayBuffer), 'win1251').toString())
-        .then(response => {
-
-            return JSON.parse(response)})
+        .then(response => JSON.parse(response))
         .then(data => {
             console.log("response ", data);
             console.log(typeof data);
@@ -119,7 +112,6 @@ function fetchData(url, ctx) {
                 result = parseResponse((tmparr));
                 console.log(Array.isArray(tmparr));
             }
-
         }).then(() => {
            
             for(let i = 0; i < result.length; i += 1) {
